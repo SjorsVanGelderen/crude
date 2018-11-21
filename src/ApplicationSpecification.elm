@@ -3,7 +3,7 @@ This file contains the specification of your models,
 including permissions and rendering preferences
 -}
 
-module ApplicationSpecification exposing (applicationSpecification)
+module ApplicationSpecification exposing ( applicationSpecification )
 
 
 import Array exposing ( Array, fromList )
@@ -13,8 +13,9 @@ import Dict  exposing ( Dict, empty, get )
 
 
 import Specification exposing ( Specification, Model, Relation, Cardinality(..)
-                              , Columns, Permissions
-                              , allowCreate, allowRead, allowUpdate, allowDelete
+                              , Columns, Permissions, allowCreate, allowRead
+                              , allowUpdate, allowDelete, columnsZero
+                              , addBoolColumns, addIntColumns, addStringColumns
                               )
 
 
@@ -35,12 +36,23 @@ book =
                           ]
 
         c : Columns
-        c = { bool   = Dict.empty
-            , string = Dict.fromList
-                       [ ("Title",  Array.fromList [ "Free software, free society" ])
-                       , ("Author", Array.fromList [ "Richard Matthew Stallman" ])
-                       ]
-            }
+        c = columnsZero
+          |> addBoolColumns
+             ( Dict.fromList
+                   [ ("Borrowed", Array.fromList [ False ])
+                   ]
+             )
+          |> addIntColumns
+             ( Dict.fromList
+                   [ ("Price", Array.fromList [ 10 ])
+                   ]
+             )
+          |> addStringColumns
+             ( Dict.fromList
+                   [ ("Title",  Array.fromList [ "Free software, free society" ])
+                   , ("Author", Array.fromList [ "Richard Matthew Stallman" ])
+                   ]
+             )
     in
         ( "Book"
         , { permissions = p
@@ -56,9 +68,7 @@ library =
         p = Dict.empty
 
         c : Columns
-        c = { bool   = Dict.empty
-            , string = Dict.empty
-            }
+        c = columnsZero
     in
         ( "Library"
         , { permissions = p
@@ -66,7 +76,7 @@ library =
           }
         )
 
-          
+
 bookLibrary : (String, Relation)
 bookLibrary = ( "Book_Library"
               , { permissions = Dict.empty
